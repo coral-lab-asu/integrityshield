@@ -7,7 +7,7 @@ import { getAssetUrl } from "@utils/basePath";
 const NAV_ITEMS = [
   { label: "Home", to: "/" },
   { label: "Video demo", to: "/video" },
-  { label: "Code repository", href: "https://github.com/fairtest-ai", external: true },
+  { label: "Code repository", href: "https://github.com/coral-lab-asu/integrityshield", external: true },
   { label: "Try it", to: "/try" },
 ];
 

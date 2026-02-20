@@ -2,9 +2,15 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 
+const GCP_BACKEND = "https://integrityshield-backend-374966265394.us-central1.run.app";
+
 export default defineConfig({
   plugins: [react()],
-  base: process.env.GITHUB_PAGES === "true" ? "/fairtestai_-llm-assessment-vulnerability-simulator-main/" : "/",
+  base: process.env.GITHUB_PAGES === "true" ? "/integrityshield/" : "/",
+  // Bake GCP backend URL into the GitHub Pages build
+  define: process.env.GITHUB_PAGES === "true" ? {
+    "import.meta.env.VITE_API_BASE_URL": JSON.stringify(`${GCP_BACKEND}/api`)
+  } : {},
   build: {
     outDir: process.env.GITHUB_PAGES === "true" ? "../docs" : "dist",
     emptyOutDir: true,
@@ -27,18 +33,19 @@ export default defineConfig({
     port: 5173,
     proxy: {
       "/api": {
-        target: "http://127.0.0.1:8000",
+        target: process.env.VITE_API_BASE_URL?.replace(/\/api\/?$/, "") || GCP_BACKEND,
         changeOrigin: true,
         ws: true,
+        rewrite: (path) => path.replace(/^\/api/, "/api"),
       },
       "/developer": {
-        target: "http://127.0.0.1:8000",
+        target: process.env.VITE_API_BASE_URL?.replace(/\/api\/?$/, "") || GCP_BACKEND,
         changeOrigin: true,
         ws: true,
       },
       "/ws": {
-        target: "ws://127.0.0.1:8000",
-        ws: true
+        target: process.env.VITE_API_BASE_URL?.replace(/\/api\/?$/, "").replace("https://", "wss://") || `wss://${GCP_BACKEND.replace("https://", "")}`,
+        ws: true,
       }
     }
   }
